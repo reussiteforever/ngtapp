@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <g id="Filter" transform="translate(-258 -77)">
+    <g id="Filter_bg" data-name="Filter bg" transform="translate(258 77)" fill="#fff" stroke="#ececec" stroke-width="1">
+      <rect width="32" height="32" rx="6" stroke="none"/>
+      <rect x="0.5" y="0.5" width="31" height="31" rx="5.5" fill="none"/>
+    </g>
+    <g id="Filtered" transform="translate(258 77)" fill="#fff" stroke="#ececec" stroke-width="1">
+      <rect width="32" height="32" rx="6" stroke="none"/>
+      <rect x="0.5" y="0.5" width="31" height="31" rx="5.5" fill="none"/>
+    </g>
+    <g id="round-filter_list-24px" transform="translate(262 81)">
+      <path id="Tracé_259" data-name="Tracé 259" d="M0,0H24V24H0Z" fill="none"/>
+      <path id="Tracé_260" data-name="Tracé 260" d="M11,18h2a1,1,0,0,0,0-2H11a1,1,0,0,0,0,2ZM3,7A1,1,0,0,0,4,8H20a1,1,0,0,0,0-2H4A1,1,0,0,0,3,7Zm4,6H17a1,1,0,0,0,0-2H7a1,1,0,0,0,0,2Z" fill="#888"/>
+    </g>
+  </g>
+</svg>
