@@ -24,6 +24,7 @@ class _SignFormState extends State<SignForm> {
   static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
   dynamic androidVersion;
   dynamic deviceImei;
+  String errorMsg;
 
   var _isLoading = false;
 
@@ -57,51 +58,38 @@ class _SignFormState extends State<SignForm> {
   }
 
   //SIGN IN FUNCTION
-  signIn(username, pass, odversion, imei, phoneScreen) async {
+  Future<dynamic> signIn(username, pass, odversion, imei) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    // Map data = {
-    //   'uid': username,
-    //   'pwd': pass,
-    //   'android_ver': odversion,
-    //   'phone_id': imei,
-    //   'phone_screen': phoneScreen
-    // };
     Map data = {
-      "uid": "ngt.demo2",
-      "pwd": "1qaz2wsx",
-      "android_ver": "9.0",
-      "phone_id": "12345678990",
-      "phone_screen": "12",
-      "phone_lat": "",
-      "phone_long": "",
-      "phone_dir": "",
-      "phone_sp": ""
+      'uid': username,
+      'pwd': pass,
+      'android_ver': odversion,
+      'phone_id': imei,
     };
     var jsonResponse;
     var url = Uri.parse(SIGN_IN_URL);
-    var response = await http.post(url, body: data);
+    var response = await http.post(url, body: jsonEncode(data));
+    dynamic valret;
     if (response.statusCode == 200) {
       jsonResponse = json.decode(response.body);
       print("json = $jsonResponse");
       print("statut = ${jsonResponse['status']}");
-      if (jsonResponse['status'] == 1) {
-        setState(() {
-          _isLoading = false;
-        });
+      if (int.parse(jsonResponse['status']) == 1) {
         sharedPreferences.setString("token", jsonResponse['token']);
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (BuildContext context) => BottomTabScreen()),
-            (Route<dynamic> route) => false);
+        sharedPreferences.setString("uid", username);
+        setState(() {
+          valret = true;
+        });
       } else {
         print("connection échoué");
+        setState(() {
+          valret = false;
+        });
       }
     } else {
-      setState(() {
-        _isLoading = false;
-      });
       print(response.body);
     }
+    return valret;
   }
 
   @override
@@ -150,20 +138,46 @@ class _SignFormState extends State<SignForm> {
                       Theme.of(context).appBarTheme.backgroundColor)),
               child: Text("SUBMIT"),
               onPressed: unController.text == "" || pwdController.text == ""
-                  ? null
-                  : () {
-                      signIn(
+                  ? () {
+                      setState(() {
+                        errorMsg = 'Please enter username and password !';
+                      });
+
+                      errorMessage(context, errorMsg);
+                    }
+                  : () async {
+                      var valret;
+                      valret = await signIn(
                           unController.text.trim(),
                           pwdController.text.trim(),
                           androidVersion,
-                          deviceImei,
-                          "");
+                          deviceImei);
+                      print(valret);
+                      if (valret == true) {
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    BottomTabScreen()),
+                            (Route<dynamic> route) => false);
+                      } else {
+                        setState(() {
+                          errorMsg = 'Invalid username or password !';
+                        });
+                        errorMessage(context, errorMsg);
+                      }
                     },
             ),
           ),
         ],
       ),
     );
+  }
+
+  errorMessage(context, message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+      backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+    ));
   }
 
   TextFormField buildPasswordFormField() {
